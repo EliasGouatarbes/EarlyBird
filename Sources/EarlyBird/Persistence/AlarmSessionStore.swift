@@ -12,9 +12,13 @@ import Foundation
 /// JSON files is more than sufficient and keeps this layer easy to reason about and
 /// inspect by hand.
 ///
-/// Not yet safe for multiple concurrent writer processes; revisit once the AlarmKit
-/// intent extension (step 3) becomes a second writer to the same App Group
-/// container.
+/// Not yet safe for multiple concurrent writer processes. As of step 3 this isn't
+/// needed: the Stop/Snooze `LiveActivityIntent`s (`AlarmSessionIntents.swift`) run
+/// as a background launch of this same app target/process (not a separate
+/// extension binary — there's no widget extension in this project), so `.shared`
+/// below is the one store both the foregrounded app and an intent's `perform()`
+/// use. Revisit (App Group + real concurrency handling) if on-device testing shows
+/// that assumption is wrong, or if a widget extension is added later.
 final class AlarmSessionStore {
     private let directory: URL
     private let fileManager: FileManager
@@ -61,6 +65,15 @@ final class AlarmSessionStore {
     private func ensureDirectoryExists() throws {
         guard !fileManager.fileExists(atPath: directory.path) else { return }
         try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+    }
+}
+
+extension AlarmSessionStore {
+    static let shared = AlarmSessionStore(directory: defaultDirectory)
+
+    private static var defaultDirectory: URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return base.appendingPathComponent("AlarmSessions", isDirectory: true)
     }
 }
 
