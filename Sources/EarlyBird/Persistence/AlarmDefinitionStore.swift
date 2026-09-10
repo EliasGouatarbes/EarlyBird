@@ -7,7 +7,9 @@ import Foundation
 /// Needed starting in step 3: the Stop/Snooze intents (`AlarmSessionIntents.swift`)
 /// run with only an `AlarmDefinition.id` in hand and need to look up its rate/max
 /// to start a session — see `AlarmSessionRecorder`.
-final class AlarmDefinitionStore {
+/// `@unchecked Sendable`: see `AlarmSessionStore`'s identical annotation — both
+/// stored properties are `let`, so there's no shared mutable memory state here.
+final class AlarmDefinitionStore: @unchecked Sendable {
     private let directory: URL
     private let fileManager: FileManager
 

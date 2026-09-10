@@ -11,9 +11,13 @@ import AlarmKit
 /// `openAppWhenRun = true` because the whole point of the Hybrid model is that our
 /// own in-app ticking-meter screen takes over from here.
 struct EarlyBirdSnoozeIntent: LiveActivityIntent {
-    static var title: LocalizedStringResource = "Snooze"
-    static var description = IntentDescription("Starts a billed snooze session.")
-    static var openAppWhenRun = true
+    // `let`, not `var`: under Swift 6 strict concurrency, a `static var` is
+    // flagged as unsynchronized global mutable state. These are never actually
+    // mutated, and the AppIntents protocol requirements are get-only, so `let`
+    // satisfies them while also being Sendable-safe.
+    static let title: LocalizedStringResource = "Snooze"
+    static let description = IntentDescription("Starts a billed snooze session.")
+    static let openAppWhenRun = true
 
     @Parameter(title: "Alarm Definition ID")
     var alarmDefinitionID: String
@@ -39,9 +43,9 @@ struct EarlyBirdSnoozeIntent: LiveActivityIntent {
 /// of the product — is something the user actually sees, and so the app gets a
 /// reliable foreground moment to kick off the backend capture call (step 6/8).
 struct EarlyBirdDismissIntent: LiveActivityIntent {
-    static var title: LocalizedStringResource = "Dismiss"
-    static var description = IntentDescription("Ends the alarm session and shows the receipt.")
-    static var openAppWhenRun = true
+    static let title: LocalizedStringResource = "Dismiss"
+    static let description = IntentDescription("Ends the alarm session and shows the receipt.")
+    static let openAppWhenRun = true
 
     @Parameter(title: "Alarm Definition ID")
     var alarmDefinitionID: String

@@ -19,7 +19,12 @@ import Foundation
 /// below is the one store both the foregrounded app and an intent's `perform()`
 /// use. Revisit (App Group + real concurrency handling) if on-device testing shows
 /// that assumption is wrong, or if a widget extension is added later.
-final class AlarmSessionStore {
+/// `@unchecked Sendable`: both stored properties are `let` (never mutated after
+/// init), so there's no actual shared mutable *memory* state for Swift 6's
+/// concurrency checker to worry about — only the underlying *file* is shared,
+/// which is a separate, already-documented concern (see the class doc comment
+/// above) that Sendable conformance doesn't speak to.
+final class AlarmSessionStore: @unchecked Sendable {
     private let directory: URL
     private let fileManager: FileManager
 
