@@ -268,7 +268,9 @@ Progress:
 
   **Not yet implemented**: the safety-net re-alert (re-showing the alert if the user backgrounds the app mid-snooze without dismissing) — deferred until on-device testing shows what state AlarmKit actually leaves the alarm in after a `.custom` secondary-button tap, since the safety-net design depends on that.
 
-  **On-device verification checklist** (needs a physical iPhone on iOS 26 — user has one; needs a way to install a build, which needs an Apple Developer Program account for code signing — TBD, see next question to user):
+  **Device access plan (decided)**: no paid Apple Developer Program account for now — user has occasional/borrowed access to a Mac and will install Xcode (free) + sign in with a free Apple ID ("Personal Team") to build and run directly on their iPhone via USB. Free installs expire after 7 days and need re-signing by reconnecting, which is fine for occasional test sessions. Revisit the $99/year account only if TestFlight (zero-Mac-touch distribution) becomes worth it later, e.g. once other people need to test builds too.
+
+  **On-device verification checklist** (needs a physical iPhone on iOS 26 — user has one; installs via free Xcode personal-team signing on a borrowed Mac, see above):
   - [ ] Does the project even compile against real AlarmKit (first CI run against this code)?
   - [ ] Does scheduling actually work — does `AlarmManager.shared.requestAuthorization()` prompt correctly, does `schedule(id:configuration:)` succeed?
   - [ ] Does the alarm fire reliably: phone locked / app backgrounded / app force-quit / phone rebooted / Focus mode on / Silent mode on?
