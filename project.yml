@@ -1,0 +1,49 @@
+name: EarlyBird
+options:
+  bundleIdPrefix: com.earlybird
+  deploymentTarget:
+    iOS: "26.0"
+configs:
+  Debug: debug
+  Release: release
+targets:
+  EarlyBird:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Sources/EarlyBird
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.earlybird.app
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_CFBundleDisplayName: EarlyBird
+  EarlyBirdTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Tests/EarlyBirdTests
+    dependencies:
+      - target: EarlyBird
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.earlybird.app.tests
+        SWIFT_VERSION: "6.0"
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  EarlyBird:
+    build:
+      targets:
+        EarlyBird: all
+        EarlyBirdTests: all
+    test:
+      targets:
+        - EarlyBirdTests
+    run:
+      config: Debug

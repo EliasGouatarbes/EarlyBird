@@ -1,0 +1,36 @@
+name: iOS CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show available Xcode versions
+        run: ls /Applications | grep Xcode
+
+      - name: Select latest Xcode
+        run: sudo xcode-select -switch "$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)/Contents/Developer"
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Show available simulators
+        run: xcrun simctl list devices available
+
+      - name: Build and test
+        run: |
+          xcodebuild \
+            -project EarlyBird.xcodeproj \
+            -scheme EarlyBird \
+            -destination "platform=iOS Simulator,name=iPhone 17,OS=latest" \
+            clean build test \
+            CODE_SIGNING_ALLOWED=NO
