@@ -5,16 +5,20 @@ import Foundation
 /// on-device (for the instant receipt) and on the backend (for the actual Stripe
 /// capture), so the two can never disagree about what's owed.
 enum MoneyCalculator {
-    /// Sums every snoozeStarted→dismissed interval in the log. `autoReAlerted`
-    /// events (the AlarmKit safety-net re-ring while the user is mid-snooze) don't
-    /// end an interval — the user is still snoozing, just being reminded. If the
-    /// log ends with an open snooze (no closing `dismissed` yet), that interval is
-    /// measured up to `now`, which is what drives a live ticking counter.
+    /// Measures the snoozeStarted→dismissed interval in the log. `dismissed` is
+    /// terminal — `AlarmSession.recordDismissed` is a no-op once a session is
+    /// already dismissed, so a real session's log never contains more than one
+    /// (snoozeStarted, dismissed) pair, and anything after the first `dismissed` is
+    /// ignored here too. `autoReAlerted` events (the AlarmKit safety-net re-ring
+    /// while the user is mid-snooze) don't end or reset the interval — the user is
+    /// still snoozing, just being reminded. If the log ends with an open snooze (no
+    /// `dismissed` yet), the interval is measured up to `now`, which is what drives
+    /// a live ticking counter.
     ///
     /// Malformed/duplicate input is handled defensively rather than asserted
     /// against, since events can arrive from more than one process: a second
     /// `snoozeStarted` while one is already open is ignored (the earlier start
-    /// wins), and anything after a `dismissed` is ignored.
+    /// wins).
     static func elapsedSnoozeSeconds(events: [AlarmSessionEvent], asOf now: Date) -> TimeInterval {
         var total: TimeInterval = 0
         var openSnoozeStart: Date?

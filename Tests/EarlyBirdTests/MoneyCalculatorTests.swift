@@ -44,15 +44,19 @@ final class MoneyCalculatorTests: XCTestCase {
         )
     }
 
-    func testMultipleSeparateSnoozeIntervalsAreSummed() {
+    func testASecondSnoozeDismissPairAfterTheFirstDismissIsIgnored() {
+        // AlarmSession.recordDismissed is terminal (a no-op once already dismissed),
+        // so a real session's log can never contain a second snoozeStarted/dismissed
+        // pair — but MoneyCalculator is fed a raw array, so it must not be fooled by
+        // one anyway. Only the first (snoozeStarted, dismissed) pair should count.
         let events = [
             event(.fired, 0),
-            event(.snoozeStarted, 0), event(.dismissed, 10), // 10s
-            event(.snoozeStarted, 20), event(.dismissed, 25), // 5s
+            event(.snoozeStarted, 0), event(.dismissed, 10), // counted: 10s
+            event(.snoozeStarted, 20), event(.dismissed, 25), // ignored: after dismissal
         ]
         XCTAssertEqual(
             MoneyCalculator.elapsedSnoozeSeconds(events: events, asOf: t0.addingTimeInterval(25)),
-            15,
+            10,
             accuracy: 0.001
         )
     }
